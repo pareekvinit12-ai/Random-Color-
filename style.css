@@ -5,3 +5,44 @@
   margin: 5px;
   display: inline-block;
 }
+
+.main {
+  width: 320px;
+  margin: 50px auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.box {
+  width: 70px;
+  height: 70px;
+  perspective: 1000px;
+}
+
+.inner {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.box.open .inner {
+  transform: rotateY(180deg);
+}
+
+.front, .back {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border-radius: 10px;
+}
+
+.front {
+  background: #222;
+}
+
+.back {
+  transform: rotateY(180deg);
+}
