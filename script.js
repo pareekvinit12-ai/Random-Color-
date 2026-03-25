@@ -8,24 +8,23 @@ let timerInterval;
 let totalMatches = 0;
 let gameOver = false;
 
-let colors = [
-  "red", "red",
-  "blue", "blue",
-  "green", "green",
-  "yellow", "yellow",
-  "orange", "orange",
-  "purple", "purple"
-];
+let colors = ["red","blue","green","yellow","orange","purple"];
+
 let first = null;
 let second = null;
 let lock = false;
 let score = 0;
-scoreDisplay.innerText = "Score: 0";
-timerDisplay.innerText = "Time: 60";
+let boxData = new Map();
+
 button.addEventListener("click", function () {
   main.style.display = "grid";
   button.style.display = "none";
+  timerDisplay.style.display = "block";
+  scoreDisplay.style.display = "block";
+
   main.innerHTML = "";
+  boxData.clear();
+
   score = 0;
   totalMatches = 0;
   time = 60;
@@ -38,12 +37,18 @@ button.addEventListener("click", function () {
 });
 
 function createBoxes() {
-  let shuffled = [...colors].sort(() => Math.random() - 0.5);
+  let pairs = [];
 
-  for (let i = 0; i < 12; i++) {
+  colors.forEach(color => {
+    pairs.push(color);
+    pairs.push(color);
+  });
+
+  pairs.sort(() => Math.random() - 0.5);
+
+  pairs.forEach(color => {
     let box = document.createElement("div");
     box.className = "box";
-    box.dataset.color = shuffled[i];
 
     let inner = document.createElement("div");
     inner.className = "inner";
@@ -58,9 +63,9 @@ function createBoxes() {
     inner.appendChild(back);
     box.appendChild(inner);
 
+    boxData.set(box, color);
+
     box.addEventListener("click", function () {
-        timerDisplay.style.display = "block";
-  scoreDisplay.style.display = "block";
       if (lock || box.classList.contains("open") || gameOver) return;
 
       score++;
@@ -69,7 +74,7 @@ function createBoxes() {
       box.classList.add("open");
 
       setTimeout(() => {
-        back.style.background = box.dataset.color;
+        back.style.background = boxData.get(box);
       }, 200);
 
       if (first === null) {
@@ -78,7 +83,8 @@ function createBoxes() {
         second = box;
         lock = true;
 
-        if (first.dataset.color === second.dataset.color) {
+
+        if (boxData.get(first) === boxData.get(second)) {
           totalMatches++;
           first = null;
           second = null;
@@ -107,7 +113,7 @@ function createBoxes() {
     });
 
     main.appendChild(box);
-  }
+  });
 }
 
 function startTimer() {
