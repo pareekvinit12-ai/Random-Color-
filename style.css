@@ -46,3 +46,16 @@
 .back {
   transform: rotateY(180deg);
 }
+.main{
+  display: none;
+}
+body{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+#timer, .scor {
+  display: none;
+}

@@ -1,4 +1,12 @@
 let main = document.querySelector(".main");
+let button = document.querySelector("button");
+let timerDisplay = document.querySelector("#timer");
+let scoreDisplay = document.querySelector(".scor");
+
+let time = 60;
+let timerInterval;
+let totalMatches = 0;
+let gameOver = false;
 
 let colors = [
   "red", "red",
@@ -8,65 +16,111 @@ let colors = [
   "orange", "orange",
   "purple", "purple"
 ];
-
-colors.sort(() => Math.random() - 0.5);
-
 let first = null;
 let second = null;
 let lock = false;
+let score = 0;
+scoreDisplay.innerText = "Score: 0";
+timerDisplay.innerText = "Time: 60";
+button.addEventListener("click", function () {
+  main.style.display = "grid";
+  button.style.display = "none";
+  main.innerHTML = "";
+  score = 0;
+  totalMatches = 0;
+  time = 60;
+  gameOver = false;
 
-for (let i = 0; i < 12; i++) {
-  let box = document.createElement("div");
-  box.className = "box";
-  box.dataset.color = colors[i];
+  scoreDisplay.innerText = "Score: 0";
 
-  let inner = document.createElement("div");
-  inner.className = "inner";
+  startTimer();
+  createBoxes();
+});
 
-  let front = document.createElement("div");
-  front.className = "front";
+function createBoxes() {
+  let shuffled = [...colors].sort(() => Math.random() - 0.5);
 
-  let back = document.createElement("div");
-  back.className = "back";
+  for (let i = 0; i < 12; i++) {
+    let box = document.createElement("div");
+    box.className = "box";
+    box.dataset.color = shuffled[i];
 
-  inner.appendChild(front);
-  inner.appendChild(back);
-  box.appendChild(inner);
+    let inner = document.createElement("div");
+    inner.className = "inner";
 
-  box.addEventListener("click", function () {
-    if (lock || box.classList.contains("open")) return;
+    let front = document.createElement("div");
+    front.className = "front";
 
-    box.classList.add("open");
+    let back = document.createElement("div");
+    back.className = "back";
 
-    setTimeout(() => {
-      back.style.background = box.dataset.color;
-    }, 200);
+    inner.appendChild(front);
+    inner.appendChild(back);
+    box.appendChild(inner);
 
-    if (first === null) {
-      first = box;
-    } else {
-      second = box;
-      lock = true;
+    box.addEventListener("click", function () {
+        timerDisplay.style.display = "block";
+  scoreDisplay.style.display = "block";
+      if (lock || box.classList.contains("open") || gameOver) return;
 
-      if (first.dataset.color === second.dataset.color) {
-        first = null;
-        second = null;
-        lock = false;
+      score++;
+      scoreDisplay.innerText = "Score: " + score;
+
+      box.classList.add("open");
+
+      setTimeout(() => {
+        back.style.background = box.dataset.color;
+      }, 200);
+
+      if (first === null) {
+        first = box;
       } else {
-        setTimeout(() => {
-          first.querySelector(".back").style.background = "";
-          second.querySelector(".back").style.background = "";
+        second = box;
+        lock = true;
 
-          first.classList.remove("open");
-          second.classList.remove("open");
-
+        if (first.dataset.color === second.dataset.color) {
+          totalMatches++;
           first = null;
           second = null;
           lock = false;
-        }, 800);
-      }
-    }
-  });
 
-  main.appendChild(box);
+          if (totalMatches === 6) {
+            clearInterval(timerInterval);
+            alert("You Win!");
+            gameOver = true;
+          }
+
+        } else {
+          setTimeout(() => {
+            first.querySelector(".back").style.background = "";
+            second.querySelector(".back").style.background = "";
+
+            first.classList.remove("open");
+            second.classList.remove("open");
+
+            first = null;
+            second = null;
+            lock = false;
+          }, 800);
+        }
+      }
+    });
+
+    main.appendChild(box);
+  }
+}
+
+function startTimer() {
+  timerDisplay.innerText = "Time: " + time;
+
+  timerInterval = setInterval(() => {
+    time--;
+    timerDisplay.innerText = "Time: " + time;
+
+    if (time <= 0) {
+      clearInterval(timerInterval);
+      gameOver = true;
+      alert("Game Over");
+    }
+  }, 1000);
 }
