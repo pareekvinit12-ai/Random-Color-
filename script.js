@@ -13,7 +13,7 @@ let colors = ["red","blue","green","yellow","orange","purple"];
 let first = null;
 let second = null;
 let lock = false;
-let score = 0;
+let Click = 0;
 let boxData = new Map();
 
 button.addEventListener("click", function () {
@@ -25,12 +25,12 @@ button.addEventListener("click", function () {
   main.innerHTML = "";
   boxData.clear();
 
-  score = 0;
+  Click = 0;
   totalMatches = 0;
   time = 60;
   gameOver = false;
 
-  scoreDisplay.innerText = "Score: 0";
+  scoreDisplay.innerText = "Click: 0";
 
   startTimer();
   createBoxes();
@@ -68,8 +68,8 @@ function createBoxes() {
     box.addEventListener("click", function () {
       if (lock || box.classList.contains("open") || gameOver) return;
 
-      score++;
-      scoreDisplay.innerText = "Score: " + score;
+      Click++;
+      scoreDisplay.innerText = "Click: " + Click;
 
       box.classList.add("open");
 
