@@ -2,6 +2,8 @@ let main = document.querySelector(".main");
 let button = document.querySelector("button");
 let timerDisplay = document.querySelector("#timer");
 let scoreDisplay = document.querySelector(".scor");
+let playerNameInput = document.querySelector("#playerName");
+let resultDisplay = document.querySelector("#result");
 
 let time = 60;
 let timerInterval;
@@ -16,11 +18,23 @@ let lock = false;
 let Click = 0;
 let boxData = new Map();
 
+let playerName = "";
 button.addEventListener("click", function () {
+
+  playerName = playerNameInput.value.trim();
+
+  if (playerName === "") {
+    alert("Enter your name first");
+    return;
+  }
+
   main.style.display = "grid";
   button.style.display = "none";
+  playerNameInput.style.display = "none";
+
   timerDisplay.style.display = "block";
   scoreDisplay.style.display = "block";
+  resultDisplay.style.display = "none";
 
   main.innerHTML = "";
   boxData.clear();
@@ -29,12 +43,24 @@ button.addEventListener("click", function () {
   totalMatches = 0;
   time = 60;
   gameOver = false;
+  first = null;
+  second = null;
+  lock = false;
 
   scoreDisplay.innerText = "Click: 0";
 
   startTimer();
   createBoxes();
 });
+function endGameUI(message) {
+  main.style.display = "none";
+  timerDisplay.style.display = "none";
+  scoreDisplay.style.display = "none";
+
+  resultDisplay.style.display = "block";
+  resultDisplay.innerText = message;
+}
+
 
 function createBoxes() {
   let pairs = [];
@@ -83,17 +109,26 @@ function createBoxes() {
         second = box;
         lock = true;
 
-
         if (boxData.get(first) === boxData.get(second)) {
           totalMatches++;
+
           first = null;
           second = null;
           lock = false;
 
           if (totalMatches === 6) {
             clearInterval(timerInterval);
-            alert("You Win!");
             gameOver = true;
+
+            let timeTaken = 60 - time;
+
+            let result = `${playerName} ne ${timeTaken} sec me ${Click} clicks me game complete kiya`;
+
+            saveResult(playerName, Click, "Win", timeTaken);
+
+            endGameUI(result);
+
+            alert("You Win!");
           }
 
         } else {
@@ -115,7 +150,6 @@ function createBoxes() {
     main.appendChild(box);
   });
 }
-
 function startTimer() {
   timerDisplay.innerText = "Time: " + time;
 
@@ -126,7 +160,27 @@ function startTimer() {
     if (time <= 0) {
       clearInterval(timerInterval);
       gameOver = true;
+
+      let result = `${playerName} game complete nahi kar paya. Clicks: ${Click}`;
+
+      saveResult(playerName, Click, "Lose", 60);
+
+      endGameUI(result);
+
       alert("Game Over");
     }
-  }, 1000);
+  }, 100);
+}
+function saveResult(name, clicks, status, timeTaken) {
+  let history = JSON.parse(localStorage.getItem("gameResults")) || [];
+
+  history.push({
+    name: name,
+    clicks: clicks,
+    status: status,
+    time: timeTaken,
+    date: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("gameResults", JSON.stringify(history));
 }
